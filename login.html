@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookFlix - Entrar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Adicione os SDKs do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <style>
+        :root {
+            --primary: #e50914;
+            --primary-dark: #c40810;
+            --dark: #141414;
+            --light-gray: #bbb;
+            --white: #fff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--white);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .auth-container {
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 40px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: var(--primary);
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            text-align: center;
+            flex: 1;
+            color: var(--light-gray);
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .tab.active {
+            color: var(--white);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+        }
+        
+        .auth-form {
+            display: none;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .auth-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--light-gray);
+            font-size: 0.9rem;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: var(--white);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.3);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-gray);
+            cursor: pointer;
+        }
+        
+        .auth-button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .auth-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .auth-button:active {
+            transform: translateY(0);
+        }
+        
+        .auth-footer {
+            margin-top: 20px;
+            text-align: center;
+            color: var(--light-gray);
+            font-size: 0.9rem;
+        }
+        
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: var(--primary);
+            margin-top: 10px;
+            font-size: 14px;
+            text-align: center;
+            padding: 8px;
+            background-color: rgba(229, 9, 20, 0.1);
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #4CAF50;
+            margin-top: 10px;
+            font-size: 14px;
+            text-align: center;
+            padding: 8px;
+            background-color: rgba(76, 175, 80, 0.1);
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(229, 9, 20, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 30px 20px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+                margin-bottom: 20px;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="logo">BOOKFLIX</div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('login')">Entrar</div>
+            <div class="tab" onclick="switchTab('register')">Registrar</div>
+        </div>
+        
+        <!-- Formulário de Login -->
+        <form id="login-form" class="auth-form active">
+            <div class="form-group">
+                <label for="login-email">Email</label>
+                <input type="email" id="login-email" required autocomplete="username">
+            </div>
+            
+            <div class="form-group password-container">
+                <label for="login-password">Senha</label>
+                <input type="password" id="login-password" required autocomplete="current-password">
+                <i class="fas fa-eye toggle-password" onclick="togglePassword('login-password')"></i>
+            </div>
+            
+            <button type="submit" class="auth-button" id="login-button">
+                <span>Entrar</span>
+            </button>
+            <div class="loading" id="login-loading">
+                <span class="loading-spinner"></span>
+                <span>Autenticando...</span>
+            </div>
+            <div id="login-error" class="error-message"></div>
+        </form>
+        
+        <!-- Formulário de Registro -->
+        <form id="register-form" class="auth-form">
+            <div class="form-group">
+                <label for="register-name">Nome</label>
+                <input type="text" id="register-name" required autocomplete="name">
+            </div>
+            
+            <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" required autocomplete="email">
+            </div>
+            
+            <div class="form-group password-container">
+                <label for="register-password">Senha (mínimo 6 caracteres)</label>
+                <input type="password" id="register-password" minlength="6" required autocomplete="new-password">
+                <i class="fas fa-eye toggle-password" onclick="togglePassword('register-password')"></i>
+            </div>
+            
+            <button type="submit" class="auth-button" id="register-button">
+                <span>Criar Conta</span>
+            </button>
+            <div class="loading" id="register-loading">
+                <span class="loading-spinner"></span>
+                <span>Criando conta...</span>
+            </div>
+            <div id="register-error" class="error-message"></div>
+            <div id="register-success" class="success-message"></div>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Ao continuar, você concorda com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> do BookFlix.</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Firebase (substitua com suas credenciais)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+        
+        // Inicialize o Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Alternar entre login e registro
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`${tab}-form`).classList.add('active');
+            
+            // Limpar mensagens
+            hideMessages();
+        }
+        
+        // Mostrar/ocultar senha
+        function togglePassword(id) {
+            const input = document.getElementById(id);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+        
+        // Ocultar todas as mensagens
+        function hideMessages() {
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('register-error').style.display = 'none';
+            document.getElementById('register-success').style.display = 'none';
+        }
+        
+        // Mostrar mensagem de erro
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+        
+        // Mostrar mensagem de sucesso
+        function showSuccess(message) {
+            const element = document.getElementById('register-success');
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+        
+        // Mostrar loading
+        function showLoading(buttonId, loadingId) {
+            document.getElementById(buttonId).style.display = 'none';
+            document.getElementById(loadingId).style.display = 'block';
+        }
+        
+        // Ocultar loading
+        function hideLoading(buttonId, loadingId) {
+            document.getElementById(buttonId).style.display = 'flex';
+            document.getElementById(loadingId).style.display = 'none';
+        }
+        
+        // Login com email/senha
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorElement = document.getElementById('login-error');
+            
+            // Mostrar loading
+            showLoading('login-button', 'login-loading');
+            hideMessages();
+            
+            try {
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                // Login bem-sucedido
+                window.location.href = 'index.html';
+            } catch (error) {
+                let errorMessage;
+                
+                switch(error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'Usuário não encontrado.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Senha incorreta.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Email inválido.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Muitas tentativas. Tente mais tarde.';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'Conta desativada.';
+                        break;
+                    default:
+                        errorMessage = 'Erro ao fazer login. Tente novamente.';
+                }
+                
+                showError('login-error', errorMessage);
+            } finally {
+                hideLoading('login-button', 'login-loading');
+            }
+        });
+        
+        // Registrar nova conta
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            
+            // Mostrar loading
+            showLoading('register-button', 'register-loading');
+            hideMessages();
+            
+            try {
+                // Validar nome
+                if (name.length < 2) {
+                    throw new Error('Por favor, insira um nome válido');
+                }
+                
+                // Criar usuário
+                const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                
+                // Atualizar perfil com o nome
+                await userCredential.user.updateProfile({
+                    displayName: name
+                });
+                
+                // Enviar email de verificação
+                await userCredential.user.sendEmailVerification();
+                
+                // Registro bem-sucedido
+                showSuccess('Conta criada com sucesso! Verifique seu email para ativar sua conta.');
+                
+                // Redirecionar após 3 segundos
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+                
+            } catch (error) {
+                let errorMessage;
+                
+                switch(error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'Este email já está em uso.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Email inválido.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'A senha deve ter no mínimo 6 caracteres.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        errorMessage = 'Operação não permitida.';
+                        break;
+                    default:
+                        errorMessage = error.message || 'Erro ao criar conta. Tente novamente.';
+                }
+                
+                showError('register-error', errorMessage);
+            } finally {
+                hideLoading('register-button', 'register-loading');
+            }
+        });
+        
+        // Verificar se o usuário já está logado
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // Se já estiver logado, redireciona para a página inicial
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // Focar no primeiro campo ao alternar entre tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const formId = this.getAttribute('onclick').replace("switchTab('", "").replace("')", "");
+                setTimeout(() => {
+                    const firstInput = document.getElementById(`${formId}-form`).querySelector('input');
+                    if (firstInput) firstInput.focus();
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

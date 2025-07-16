@@ -1,6 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+<script>
+  // Configuração do Firebase (substitua com suas credenciais)
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_PROJETO.firebaseapp.com",
+    projectId: "SEU_PROJETO",
+    storageBucket: "SEU_PROJETO.appspot.com",
+    messagingSenderId: "SEU_SENDER_ID",
+    appId: "SEU_APP_ID"
+  };
+  
+  // Inicialize o Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookFlix - Seu Netflix de Livros</title>
@@ -484,5 +500,35 @@
             // Implemente um modal de cadastro aqui
         }
     </script>
+    <script>
+    // Verificar estado de autenticação
+    firebase.auth().onAuthStateChanged((user) => {
+        const loginButton = document.querySelector('.nav-links a[onclick="openLoginModal()"]');
+        
+        if (user) {
+            // Usuário logado
+            loginButton.textContent = 'Minha Conta';
+            loginButton.onclick = () => {
+                // Menu da conta (pode expandir isso)
+                if (confirm('Deseja sair da sua conta?')) {
+                    firebase.auth().signOut();
+                }
+            };
+        } else {
+            // Usuário não logado
+            loginButton.textContent = 'Entrar';
+            loginButton.onclick = () => {
+                window.location.href = 'login.html';
+            };
+        }
+    });
+
+    // Função de logout
+    function logout() {
+        firebase.auth().signOut().then(() => {
+            window.location.href = 'index.html';
+        });
+    }
+    </script>
 </body>
-</html>
+</html>         
