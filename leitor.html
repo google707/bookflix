@@ -89,15 +89,79 @@
             margin: 0 auto;
         }
         
+        /* Estilo aprimorado para a capa principal */
         .book-cover-large {
             min-width: 300px;
             height: 450px;
             background-color: #333;
-            border-radius: 8px;
+            border-radius: 12px;
             background-size: cover;
             background-position: center;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
             flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .book-cover-large::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.15) 0%,
+                rgba(255, 255, 255, 0) 60%
+            );
+            z-index: 1;
+            transition: all 0.4s ease;
+        }
+        
+        .book-cover-large:hover {
+            transform: scale(1.02) rotateY(5deg);
+            box-shadow: 0 16px 32px rgba(229, 9, 20, 0.3);
+            filter: brightness(1.05) contrast(1.05) saturate(1.1);
+        }
+        
+        .book-cover-large:hover::before {
+            background: linear-gradient(
+                135deg,
+                rgba(255, 255, 255, 0.25) 0%,
+                rgba(255, 255, 255, 0.1) 60%
+            );
+        }
+        
+        /* Efeito de reflexo para a capa principal */
+        .book-cover-large .reflection {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0) 55%
+            );
+            transform: rotate(30deg);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .book-cover-large:hover .reflection {
+            opacity: 1;
+            animation: shine 2s ease infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: rotate(30deg) translateX(-100%); }
+            100% { transform: rotate(30deg) translateX(100%); }
         }
         
         .book-info {
@@ -120,6 +184,7 @@
             display: flex;
             gap: 20px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         
         .book-meta-item {
@@ -138,6 +203,7 @@
             display: flex;
             gap: 15px;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
         
         .action-button {
@@ -159,6 +225,7 @@
         
         .primary-button:hover {
             background-color: var(--primary-dark);
+            transform: translateY(-2px);
         }
         
         .secondary-button {
@@ -169,6 +236,7 @@
         
         .secondary-button:hover {
             border-color: var(--white);
+            background-color: rgba(255, 255, 255, 0.1);
         }
         
         .book-details-section {
@@ -237,6 +305,7 @@
             border-radius: 20px;
         }
         
+        /* Estilo aprimorado para as capas dos livros similares */
         .book-cover {
             min-width: 200px;
             height: 300px;
@@ -244,16 +313,33 @@
             border-radius: 8px;
             background-size: cover;
             background-position: center;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .book-cover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0) 60%,
+                rgba(0, 0, 0, 0.8) 100%
+            );
+            z-index: 1;
         }
         
         .book-cover:hover {
-            transform: scale(1.05);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            transform: scale(1.08) translateY(-5px);
+            box-shadow: 0 12px 24px rgba(229, 9, 20, 0.3);
+            z-index: 10;
+            filter: brightness(1.1) contrast(1.05) saturate(1.1);
         }
         
         /* Footer */
@@ -293,6 +379,8 @@
             
             .book-cover-large {
                 margin: 0 auto;
+                min-width: 250px;
+                height: 375px;
             }
             
             .details-grid {
@@ -321,6 +409,11 @@
                 font-size: 1.2rem;
             }
             
+            .book-cover-large {
+                min-width: 200px;
+                height: 300px;
+            }
+            
             .action-buttons {
                 flex-direction: column;
             }
@@ -342,7 +435,9 @@
     
     <!-- Book Details Section -->
     <section class="book-details">
-        <div class="book-cover-large" id="book-cover"></div>
+        <div class="book-cover-large" id="book-cover">
+            <div class="reflection"></div>
+        </div>
         
         <div class="book-info">
             <h1 class="book-title" id="book-title">Carregando...</h1>
@@ -366,7 +461,7 @@
             <p class="book-description" id="book-description"></p>
             
             <div class="action-buttons">
-                <button class="action-button primary-button">
+                <button class="action-button primary-button" id="read-now">
                     <i class="fas fa-book-open"></i> Ler Agora
                 </button>
                 <button class="action-button secondary-button" id="add-to-list">
@@ -448,18 +543,40 @@
             
             try {
                 const response = await fetch(`https://www.googleapis.com/books/v1/volumes/${bookId}`);
-                const book = await response.json();
                 
-                if (book.error) {
+                if (!response.ok) {
                     throw new Error('Livro não encontrado');
                 }
                 
+                const book = await response.json();
                 const info = book.volumeInfo;
                 
-                // Set book cover
+                // Set book cover with higher quality image
                 const cover = document.getElementById('book-cover');
-                if (info.imageLinks?.thumbnail) {
-                    cover.style.backgroundImage = `url('${info.imageLinks.thumbnail.replace('http://', 'https://')}')`;
+                if (info.imageLinks) {
+                    // Try to get the highest quality image available
+                    const imageUrl = info.imageLinks.extraLarge || 
+                                    info.imageLinks.large || 
+                                    info.imageLinks.medium || 
+                                    info.imageLinks.thumbnail || 
+                                    info.imageLinks.smallThumbnail;
+                    
+                    if (imageUrl) {
+                        // Improve image quality by replacing parameters
+                        let finalUrl = imageUrl.replace('http://', 'https://')
+                                               .replace('zoom=1', 'zoom=2')
+                                               .replace('&edge=curl', '');
+                        
+                        // For Google Books covers, we can try to get higher resolution
+                        if (finalUrl.includes('googlebooks')) {
+                            finalUrl = finalUrl.replace('&printsec=frontcover', '')
+                                              .replace('&img=1', '&img=1&printsec=frontcover&w=600');
+                        }
+                        
+                        cover.style.backgroundImage = `url('${finalUrl}')`;
+                    } else {
+                        cover.style.backgroundImage = 'url("https://via.placeholder.com/300x450/333/fff?text=Sem+Capa")';
+                    }
                 } else {
                     cover.style.backgroundImage = 'url("https://via.placeholder.com/300x450/333/fff?text=Sem+Capa")';
                 }
@@ -488,6 +605,17 @@
                     document.getElementById('book-isbn').textContent = 'Não disponível';
                 }
                 
+                // Set up "Read Now" button
+                const readNowBtn = document.getElementById('read-now');
+                if (info.previewLink) {
+                    readNowBtn.onclick = () => {
+                        window.open(info.previewLink, '_blank');
+                    };
+                } else {
+                    readNowBtn.disabled = true;
+                    readNowBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Prévia não disponível';
+                }
+                
                 // Load similar books
                 if (info.categories && info.categories.length > 0) {
                     loadSimilarBooks(info.categories[0]);
@@ -502,18 +630,22 @@
             }
         }
         
-        // Load similar books
+        // Load similar books with better quality covers
         async function loadSimilarBooks(query) {
             const container = document.getElementById('similar-books');
             
             try {
                 const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=8&langRestrict=pt`);
-                const data = await response.json();
                 
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar livros similares');
+                }
+                
+                const data = await response.json();
                 container.innerHTML = '';
                 
                 if (data.items) {
-                    // Filter out the current book
+                    // Filter out the current book and get best quality covers
                     const similarBooks = data.items.filter(book => book.id !== bookId).slice(0, 6);
                     
                     if (similarBooks.length === 0) {
@@ -523,17 +655,28 @@
                     
                     similarBooks.forEach(book => {
                         const info = book.volumeInfo;
-                        const capa = info.imageLinks?.thumbnail || 'https://via.placeholder.com/200x300/333/fff?text=Sem+Capa';
-                        const id = book.id;
-                        const title = info.title || 'Título desconhecido';
+                        let coverUrl = '';
+                        
+                        // Get the best available cover image
+                        if (info.imageLinks) {
+                            coverUrl = info.imageLinks.thumbnail || 
+                                      info.imageLinks.smallThumbnail || 
+                                      'https://via.placeholder.com/200x300/333/fff?text=Sem+Capa';
+                            
+                            // Improve image quality
+                            coverUrl = coverUrl.replace('http://', 'https://')
+                                              .replace('zoom=1', 'zoom=2');
+                        } else {
+                            coverUrl = 'https://via.placeholder.com/200x300/333/fff?text=Sem+Capa';
+                        }
                         
                         const bookElement = document.createElement('div');
                         bookElement.className = 'book-cover';
-                        bookElement.style.backgroundImage = `url('${capa}')`;
-                        bookElement.title = title;
+                        bookElement.style.backgroundImage = `url('${coverUrl}')`;
+                        bookElement.title = info.title || 'Título desconhecido';
                         
                         bookElement.onclick = () => {
-                            window.location.href = `leitor.html?id=${id}`;
+                            window.location.href = `leitor.html?id=${book.id}`;
                         };
                         
                         container.appendChild(bookElement);
@@ -543,7 +686,12 @@
                 }
             } catch (error) {
                 console.error('Erro ao carregar livros similares:', error);
-                container.innerHTML = '<p>Erro ao carregar livros similares.</p>';
+                container.innerHTML = `
+                    <div style="text-align: center; width: 100%; padding: 20px; color: var(--light-gray);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Erro ao carregar livros similares</p>
+                    </div>
+                `;
             }
         }
         
@@ -554,10 +702,11 @@
             this.innerHTML = '<i class="fas fa-check"></i> Na Sua Lista';
             this.classList.remove('secondary-button');
             this.classList.add('primary-button');
+            this.disabled = true;
         });
         
         // Load book when page loads
-        window.onload = loadBookDetails;
+        document.addEventListener('DOMContentLoaded', loadBookDetails);
     </script>
 </body>
 </html>
